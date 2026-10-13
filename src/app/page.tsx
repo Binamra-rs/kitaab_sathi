@@ -1,5 +1,7 @@
 "use client";
 
+import { Review } from "@/lib/reviews";
+
 import { useState } from "react";
 import { searchBooks, Book } from "@/lib/books";
 import { Search, Loader2, Star, BookOpenCheck } from "lucide-react";
@@ -12,6 +14,8 @@ export default function Home(){
   const [books, setbooks] = useState<Book[]>([])
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+  const [selectBook, setSelectedBook] = useState<Book | null>(null)
+  const [allReviews, setAllReviews] = useState<Review[]>([])
 
   const handleSearch = async(e:React.FormEvent)=>{
     e.preventDefault()
@@ -53,7 +57,7 @@ export default function Home(){
       ): hasSearched && books.length ===0?(
         <div className="text-center py-16 text-slate-500">
           <BookOpenCheck className="w-12 h-12 mx-auto mb-3 opacity-40"></BookOpenCheck>
-          <p className="text-lg font-medium">No books found matching &quot;{query}&qout;</p>
+          <p className="text-lg font-medium">No books found matching &quot;{query}&quot;</p>
           <p className="text-sm">Try searching for something else...</p>
         </div>
       )
@@ -63,7 +67,8 @@ export default function Home(){
             const coverUrl = book.cover_i?`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`: "https://via.placeholder.com/150x220?text=No+Cover"
           
           return (
-            <Card key={book.key} className="flex flex-col justify-between overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={book.key} className="flex flex-col justify-between overflow-hidden hover:shadow-lg transition-shadow"
+            onClick={()=>setSelectedBook(book)}>
             <div>
               <div className="h-48 w-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden">
                 <img src={coverUrl} alt={book.title} className="h-full object-contain py-2"></img>
@@ -78,8 +83,11 @@ export default function Home(){
             </div>
             
             <CardFooter className="p-4 pt-0 flex-justify-between items-center text-xs text-slate-500">
-              <span>{book.publication_year || "N/A"}</span>
-              <Button variant="outline" size="sm" className="h-8 text-xs">
+              <Button variant="outline" size="sm" className="h-8 text-xs" 
+              onClick={(e)=>{
+                e.stopPropagation()
+                setSelectedBook(book)
+              }}>
                 View & Review
               </Button>
             </CardFooter>
